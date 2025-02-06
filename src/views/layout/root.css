@@ -1,0 +1,15 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: hsl(200, 20%, 20%);
+    color: hsl(40, 40%, 92%);
+    display: grid;
+    font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
+    gap: 12vmin;
+    height: 100vh;
+    place-content: center;
+}

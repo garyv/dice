@@ -1,0 +1,9 @@
+# os
+.DS_Store
+
+# node
+node_modules/
+
+# app
+public/index.html
+src/bridge/secrets.json

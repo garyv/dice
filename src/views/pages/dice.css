@@ -1,0 +1,159 @@
+:root {
+    --background-color: hsl(200, 22%, 90%);
+    --border-color: hsl(0, 0%, 5%);
+    --border-radius: 1px;
+    --border-width: 2vmin;
+    --dot-color: hsl(0, 0%, 5%);
+    --dot-size: 20%;
+    --duration: 2.8s;
+    --half-size: calc(var(--size) / 2);
+    --size: 50vmin;
+}
+
+.space-3d {
+    height: var(--size);
+    width: var(--size);
+    display: grid;
+    perspective-origin: 50% 100%;
+    perspective: 150vmin;
+    place-content: center;
+}
+
+.cube {
+    height: var(--size);
+    width: var(--size);
+    background-color: var(--border-color);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform var(--duration);
+
+    i {
+        display: block;
+        position: absolute;
+        height: var(--dot-size);
+        width: var(--dot-size);
+        background: var(--dot-color);
+        border-radius: 50%;
+        top: 20%;
+        left: 20%;
+        margin-top: calc(var(--dot-size) / -2);
+        margin-left: calc(var(--dot-size) / -2);
+    }
+
+    aside {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        backface-visibility: hidden;
+        background: var(--background-color);
+        border-color: var(--border-color);
+        border-radius: var(--border-radius);
+        border-style: solid;
+        border-width: var(--border-width);
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+}
+
+.front {
+    transform: translateZ(var(--half-size));
+
+    i {
+        left: 50%;
+        top: 50%;
+    }
+}
+
+.back {
+    transform: rotateX(-180deg) translateZ(var(--half-size));
+
+    > :nth-child(1) {
+        left: 80%;
+    }
+
+    > :nth-child(2) {
+        top: 80%;
+    }
+}
+
+.right {
+    transform: rotateY(90deg) translateZ(var(--half-size));
+
+    > :nth-child(1) {
+        left: 80%;
+    }
+
+    > :nth-child(2) {
+        left: 50%;
+        top: 50%;
+    }
+
+    > :nth-child(3) {
+        top: 80%;
+    }
+}
+
+.left {
+    transform: rotateY(-90deg) translateZ(var(--half-size));
+
+    > :nth-child(2) {
+        left: 80%;
+    }
+
+    > :nth-child(3) {
+        left: 80%;
+        top: 80%;
+    }
+
+    > :nth-child(4) {
+        top: 80%;
+    }
+}
+
+.top {
+    transform: rotateX(90deg) translateZ(var(--half-size));
+
+    > :nth-child(2) {
+        left: 50%;
+        top: 50%;
+    }
+
+    > :nth-child(3) {
+        top: 80%;
+    }
+
+    > :nth-child(4) {
+        left: 80%;
+    }
+
+    > :nth-child(5) {
+        left: 80%;
+        top: 80%;
+    }
+}
+
+.bottom {
+    transform: rotateX(-90deg) translateZ(var(--half-size));
+
+    > :nth-child(2) {
+        top: 50%;
+    }
+
+    > :nth-child(3) {
+        top: 80%;
+    }
+
+    > :nth-child(4) {
+        left: 80%;
+    }
+
+    > :nth-child(5) {
+        left: 80%;
+        top: 50%;
+    }
+
+    > :nth-child(6) {
+        left: 80%;
+        top: 80%;
+    }
+}
