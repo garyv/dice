@@ -2,20 +2,30 @@
   "name": "dice",
   "version": "0.0.5",
   "description": "roll dice",
-  "main": "src/bridge/index.js",
+  "main": "src/stack/index.js",
   "scripts": {
-    "start": "node src/bridge/index.js",
+    "start": "node src/stack/index.js",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "build": "node src/bridge/build.js",
-    "build:watch": "nodemon src/bridge/build.js"
+    "build": "node src/stack/build.js",
+    "build:watch": "nodemon src/stack/build.js --hot-reload",
+    "dev-server": "node src/stack/adapters/dev-server.js",
+    "dev": "concurrently \"npm run build:watch\" \"npm run dev-server\""
   },
   "author": "Gary Von Schilling",
   "license": "UNLICENSED",
   "devDependencies": {
-    "nodemon": "^3.1.9",
+    "concurrently": "7.6.0",
+    "nodemon": "3.1.9",
     "prettier": "3.4.2",
-    "vitest": "2.1.8"
+    "vitest": "2.1.8",
+    "ws": "^8.18.0"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "js,css,html"
   },
   "type": "module"
 }

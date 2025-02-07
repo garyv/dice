@@ -31,7 +31,16 @@ export const fileTemplater = {
     write: async (destinationPath, templatePath, fileStore, variables = {}) => {
         const content = await fileTemplater.load(templatePath, fileStore, variables);
         return await fileStore.writeFile(destinationPath, content, 'utf-8');
-    },   
+    },
+
+    init: (fileStore, filePaths) => ({
+        load: (path, variables = {})  => 
+            fileTemplater.load(filePaths[path], fileStore, variables),
+        loadJs: (path, variables = {}) => 
+            fileTemplater.loadJs(filePaths[path], fileStore, variables),
+        write: (destinationPath, templatePath, variables = {}) =>
+            fileTemplater.write(destinationPath, filePaths[templatePath], fileStore, variables),
+    })
 }
 
 function getValue(variables, key) {
