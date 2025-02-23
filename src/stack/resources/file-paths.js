@@ -1,5 +1,5 @@
 //@ts-check
-import { pathFinder } from '../adapters/path-finder.js';
+import { resolve } from 'path';
 
 const mainPaths = {
     /** Output path file single page app */
@@ -15,11 +15,15 @@ export const filePaths = {
     /** Dice configuration */
     diceConfig: 'domain/models/dice-config.js',
     diceEvents: 'domain/events/dice-events.js',
-    diceStart: 'stack/resources/dice.js',
+    diceStart: 'stack/resources/dice-client.js',
     randomizer: 'domain/models/randomizer.js',
     /** Dice html */
     dicePage: 'views/pages/dice.html',
     diceStyles: 'views/pages/dice.css',
+    /** Dev script */
+    hotReload: 'stack/resources/hot-reload.js',
 };
 
-pathFinder.update(filePaths);
+Object.keys(filePaths).forEach(name => {
+    filePaths[name] = resolve(`src/${ filePaths[name] }`);
+});

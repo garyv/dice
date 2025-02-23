@@ -16,7 +16,7 @@ const randomizer = await loadJs('randomizer');
 const diceEvents = await loadJs('diceEvents');
 const diceStart = await loadJs('diceStart');
 
-const hotReload = process.argv.some(arg => arg  === '--hot-reload');
+const hotReload = process.argv.some((arg) => arg === '--hot-reload');
 
 const html = await load('layout', {
     head: `<title>${diceConfig.title}</title>
@@ -40,4 +40,4 @@ ${hotReload ? '<script src="/hot-reload.js"></script>' : ''}
 
 fileStore.writeFile(filePaths.build, html);
 
-console.log('Build complete.', filePaths.build);
+console.log('Build complete.', html.split('\n').slice(-9).join('\n'), filePaths.build);

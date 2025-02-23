@@ -9,7 +9,7 @@
     "test:watch": "vitest watch",
     "build": "node src/stack/build.js",
     "build:watch": "nodemon src/stack/build.js --hot-reload",
-    "dev-server": "node src/stack/adapters/dev-server.js",
+    "dev-server": "node src/stack/resources/dev-server.js",
     "dev": "concurrently \"npm run build:watch\" \"npm run dev-server\""
   },
   "author": "Gary Von Schilling",
