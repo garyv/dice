@@ -16,7 +16,7 @@ body {
     display: grid;
     font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
     gap: 12vmin;
-    height: 100vh;
+    height: 100dvh;
     place-content: center;
 }
 
@@ -29,7 +29,9 @@ body {
     --dot-size: 20%;
     --duration: 2.8s;
     --half-size: calc(var(--size) / 2);
-    --size: 50vmin;
+    --opacity: 1;
+    --transparent: 0.42;
+    --size: 45vmin;
 }
 
 .space-3d {
@@ -44,10 +46,10 @@ body {
 .cube {
     height: var(--size);
     width: var(--size);
-    background-color: var(--border-color);
     position: relative;
     transform-style: preserve-3d;
     transition: transform var(--duration);
+    user-select: none;
 
     i {
         display: block;
@@ -74,6 +76,8 @@ body {
         border-width: var(--border-width);
         box-sizing: border-box;
         cursor: pointer;
+        opacity: var(--opacity);
+        transition: opacity var(--duration);
     }
 }
 
@@ -183,7 +187,7 @@ body {
 </head>
 
 <body>
-    <section class='space-3d'>
+    <section class='space-3d' role='region' aria-label='Dice container'>
     <div class='cube' role='button' aria-label='Click to roll the dice'>
         <aside class='front'>
             <i></i>
@@ -219,6 +223,8 @@ const diceConfig = {
     max: 2,
     cssSelector: "[role='button']",
     htmlProps: "role='button' aria-label='Click to roll the dice'",
+    parentSelector: "[role='region']",
+    parentProps: "role='region' aria-label='Dice container'",
 };
 
 const diceEvents = {
@@ -226,37 +232,79 @@ const diceEvents = {
         document.querySelectorAll(cssSelector)
     ),
 
+    dragStart: ({ clientX, clientY }) => {
+        state.dragging = true;
+        state.startX = clientX;
+        state.startY = clientY; 
+    },
+
+    drag: (dice, { clientX, clientY }) => {
+        if (!state.dragging) return;
+
+        dice.style.setProperty('--duration', '0');
+        dice.style.setProperty('--opacity', 'var(--transparent');
+
+        dice.style.transform = getRotation({
+            x: state.x - (clientY - state.startY),
+            y: state.y + (clientX - state.startX)
+        });
+    },
+
     roll: (dice, {spinDuration, ...transformOptions}) => {
         dice.style.setProperty('--duration', spinDuration);
-        dice.style.transform = getTransform(transformOptions);
+        dice.style.setProperty('--opacity', '1');
+        dice.style.transform = setRotation(transformOptions);
     },
 
     rollAll: ({cssSelector, ...rollOptions}) => {
+        if (!state.dragging) return;
+        state.dragging = false;
         diceEvents.getAll({cssSelector}).forEach(dice => 
             diceEvents.roll(dice, rollOptions)
         );
     },
 
-    start: ({cssSelector, ...rollOptions}) => {
+    start: ({cssSelector, parentSelector, ...rollOptions}) => {
+
         diceEvents.getAll({cssSelector}).forEach(dice => {
-            dice.addEventListener('click', () => {
+            dice.addEventListener('pointerdown', diceEvents.dragStart);
+            
+            dice.addEventListener('pointermove', (event) => {
+                requestAnimationFrame(() => {
+                    diceEvents.drag(dice, event);
+                });
+            });
+        });
+
+        diceEvents.getAll({cssSelector: parentSelector}).forEach(parent => {
+            parent.addEventListener('pointerup', () => {
+                diceEvents.rollAll({cssSelector, ...rollOptions})
+            });
+
+            parent.addEventListener('pointerleave', () => {
                 diceEvents.rollAll({cssSelector, ...rollOptions})
             });
         });
-    }
+    },
 }
 
-const getTransform = ({spinMax, spinStep, getRandomNumber}) => {
-    const numberOptions = { start: 0, length: spinMax, step: spinStep }; 
+const getRotation = ({ x, y }) =>  `rotateX(${ x }deg) rotateY(${ y }deg)`;
 
-    return (
-        `rotateX(${ 
-            getRandomNumber(numberOptions) 
-        }deg) rotateY(${ 
-            getRandomNumber(numberOptions)
-        }deg)`
-    );
+const state = {
+    dragging: false,
+    startX: 0,
+    startY: 0,  
+    x: 0,
+    y: 0,
 };
+
+const setRotation = ({spinMax, spinStep, getRandomNumber}) => {
+    const numberOptions = { start: 0, length: spinMax, step: spinStep }; 
+    state.x = getRandomNumber(numberOptions);
+    state.y = getRandomNumber(numberOptions);
+    return getRotation(state);
+};
+
 
 const randomizer = {
     getRandomNumber: ({ start = 1, step = 1, length = 6 } = {}) =>
