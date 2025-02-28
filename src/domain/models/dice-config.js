@@ -13,4 +13,6 @@ export const diceConfig = {
     max: 2,
     cssSelector: "[role='button']",
     htmlProps: "role='button' aria-label='Click to roll the dice'",
+    parentSelector: "[role='region']",
+    parentProps: "role='region' aria-label='Dice container'",
 };

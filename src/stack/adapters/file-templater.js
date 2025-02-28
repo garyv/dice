@@ -18,28 +18,28 @@ export const fileTemplater = {
             .replace(patterns.slot, (_match, key, content) => 
                 getValue(variables, key) || content),
     
-    load: async (path, fileStore, variables = {}) => {
-        const template = await fileStore.readFile(path, 'utf-8');
+    load: async (path, store, variables = {}) => {
+        const template = await store.read(path, 'utf-8');
         return fileTemplater.render(template, variables);
     },
 
-    loadJs: async (path, fileStore, variables = {}) => 
+    loadJs: async (path, store, variables = {}) => 
         stripJs(
-            await fileTemplater.load(path, fileStore, variables)
+            await fileTemplater.load(path, store, variables)
         ),
     
-    write: async (destinationPath, templatePath, fileStore, variables = {}) => {
-        const content = await fileTemplater.load(templatePath, fileStore, variables);
-        return await fileStore.writeFile(destinationPath, content, 'utf-8');
+    write: async (destinationPath, templatePath, store, variables = {}) => {
+        const content = await fileTemplater.load(templatePath, store, variables);
+        return await store.write(destinationPath, content, 'utf-8');
     },
 
-    init: (fileStore, filePaths) => ({
+    init: (store, filePaths) => ({
         load: (path, variables = {})  => 
-            fileTemplater.load(filePaths[path], fileStore, variables),
+            fileTemplater.load(filePaths[path], store, variables),
         loadJs: (path, variables = {}) => 
-            fileTemplater.loadJs(filePaths[path], fileStore, variables),
+            fileTemplater.loadJs(filePaths[path], store, variables),
         write: (destinationPath, templatePath, variables = {}) =>
-            fileTemplater.write(destinationPath, filePaths[templatePath], fileStore, variables),
+            fileTemplater.write(destinationPath, filePaths[templatePath], store, variables),
     })
 }
 

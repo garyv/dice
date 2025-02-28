@@ -4,9 +4,9 @@ import { promises, watch } from 'node:fs';
 
 const { readFile, writeFile } = promises;
 
-/** @type {import('./types/file-store').FileStore} */
+/** @type {import('./types/store').Store} */
 export const fileStore = {
-    readFile,
-    writeFile,
+    read: readFile,
+    write: writeFile,
     watch,
 }

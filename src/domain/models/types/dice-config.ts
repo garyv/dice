@@ -12,5 +12,7 @@ export type DiceConfig = {
     /** quantiy of cubes */
     max: number;
     cssSelector: string;
+    parentSelector: string;
     htmlProps: string;
+    parentProps: string;
 };

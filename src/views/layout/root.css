@@ -10,6 +10,7 @@ body {
     display: grid;
     font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
     gap: 12vmin;
-    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     place-content: center;
 }

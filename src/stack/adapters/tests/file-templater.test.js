@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fileTemplater } from '../file-templater.js';
 
-const mockFileStore = {
-    readFile: vi.fn(),
-    writeFile: vi.fn()
+const mockStore = {
+    read: vi.fn(),
+    write: vi.fn()
 };
 
 const template = 'Hello {{name}}';
@@ -27,22 +27,22 @@ describe('fileTemplater', () => {
 
     describe('load', () => {
         it('should load and render a template from a file', async () => {
-            mockFileStore.readFile.mockResolvedValue(template);
+            mockStore.read.mockResolvedValue(template);
 
             expect(
-                await fileTemplater.load('/template/path', mockFileStore, variables)
+                await fileTemplater.load('/template/path', mockStore, variables)
             ).toBe('Hello World');
         });
     });
 
     describe('write', () => {
         it('should write rendered content to a file', async () => {
-            mockFileStore.readFile.mockResolvedValue(template);
-            mockFileStore.writeFile.mockResolvedValue();
+            mockStore.read.mockResolvedValue(template);
+            mockStore.write.mockResolvedValue();
 
-            await fileTemplater.write('/output/path', '/template/path', mockFileStore, variables);
+            await fileTemplater.write('/output/path', '/template/path', mockStore, variables);
 
-            expect(mockFileStore.writeFile).toHaveBeenCalledWith('/output/path', 'Hello World', 'utf-8');
+            expect(mockStore.write).toHaveBeenCalledWith('/output/path', 'Hello World', 'utf-8');
         });
     });
 });

@@ -7,7 +7,9 @@
     --dot-size: 20%;
     --duration: 2.8s;
     --half-size: calc(var(--size) / 2);
-    --size: 50vmin;
+    --opacity: 1;
+    --transparent: 0.42;
+    --size: 45vmin;
 }
 
 .space-3d {
@@ -22,10 +24,10 @@
 .cube {
     height: var(--size);
     width: var(--size);
-    background-color: var(--border-color);
     position: relative;
     transform-style: preserve-3d;
     transition: transform var(--duration);
+    user-select: none;
 
     i {
         display: block;
@@ -52,6 +54,8 @@
         border-width: var(--border-width);
         box-sizing: border-box;
         cursor: pointer;
+        opacity: var(--opacity);
+        transition: opacity var(--duration);
     }
 }
 

@@ -2,9 +2,9 @@
   "name": "dice",
   "version": "0.0.5",
   "description": "roll dice",
-  "main": "src/stack/index.js",
+  "main": "src/stack/build.js",
   "scripts": {
-    "start": "node src/stack/index.js",
+    "start": "npm run dev",
     "test": "vitest",
     "test:watch": "vitest watch",
     "build": "node src/stack/build.js",

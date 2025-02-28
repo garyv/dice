@@ -1,31 +1,29 @@
 //@ts-check
-
-import { fileStore } from '../adapters/file-store.js';
+import { fileStore as store } from '../adapters/file-store.js';
 import { fileTemplater } from '../adapters/file-templater.js';
-import { nodeServer } from '../adapters/node-server.js';
-import { filePaths } from './file-paths.js';
+import { nodeServer as web } from '../adapters/node-server.js';
+import { filePaths as paths } from './file-paths.js';
 
-const { load } = fileTemplater.init(fileStore, filePaths);
+const { load } = fileTemplater.init(store, paths);
+const hotReload = await load('hotReload');
+const server = web.createServer();
+const { get, respond } = server;
 
-const server = nodeServer.createServer();
-
-server.get('/', async () => {
+get('/', async () => {
     const build = await load('build');
-    return server.respond(build);
+    return respond(build);
 });
 
-const hotReloadScript = await load('hotReload');
-
-server.get('/hot-reload.js', async () =>
-    server.respond(hotReloadScript, {
+get('/hot-reload.js', async () =>
+    respond(hotReload, {
         headers: { 'Content-Type': 'application/javascript' },
     })
-);
+)
 
 server.websocket('/live-reload', async (socket) => {
-    fileStore.watch(filePaths.build, () => {
+    store.watch(paths.build, () => {
         socket.send('reload');
     });
-});
+})
 
 server.start(8080);

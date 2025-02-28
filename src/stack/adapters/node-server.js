@@ -3,15 +3,6 @@
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 
-/**
- * @typedef {import('./types/web-server.ts').WebServer} WebServer
- * @typedef {import('./types/web-server.ts').WebRoute} WebRoute
- * @typedef {import('./types/web-server.ts').WebSocketRoute} WebSocketRoute
- * @typedef {import('./types/web-server.ts').WebRespond} WebRespond
- * @typedef {import('http').ServerResponse} ServerResponse 
- * @typedef {import('http').IncomingMessage} IncomingMessage 
- **/
-
 /** @type WebServer */
 export const nodeServer = {
     createServer(
@@ -25,7 +16,7 @@ export const nodeServer = {
             routes.push({ path: /.*/, handler: defaultHandler });
         }
 
-        const server = createServer(async (nodeRequest, nodeResponse) => {
+        const nodeServer = createServer(async (nodeRequest, nodeResponse) => {
             const request = formatRequest(nodeRequest);
             const requestPath = nodeRequest.url ?? '';
             const matchedRoute = routes.find(({ path }) => path.test(requestPath));
@@ -36,7 +27,6 @@ export const nodeServer = {
                 return await sendResponse(response, nodeResponse);
             }
 
-            
             try {
                 response = await matchedRoute.handler(request);
             } catch (err) {
@@ -47,7 +37,7 @@ export const nodeServer = {
 
         /** @type {WebSocketRoute[]} */
         const wsRoutes = [];
-        const socketServer = new WebSocketServer({ server });
+        const socketServer = new WebSocketServer({ server: nodeServer });
 
         socketServer.on('connection', (socket, nodeRequest) => {
             const requestPath = nodeRequest.url ?? '';
@@ -57,21 +47,24 @@ export const nodeServer = {
             matchedRoute.handler(socket, nodeRequest);
         });
 
-        return {
+        const server = {
             get: (path, handler) => {
                 const { pattern } = pathToPattern(path);
                 routes.push({ path: pattern, handler });
+                return server;
             },
+            respond,
             start: (port = 3000, callback = defaultStartCallback) => {
-                server.listen(port);
+                nodeServer.listen(port);
                 callback(port);
             },
             websocket: (path, handler) => {
                 const { pattern } = pathToPattern(path);
                 wsRoutes.push({ path: pattern, handler });
+                return server;
             },
-            respond,
         };
+        return server;
     },
 };
 
@@ -113,3 +106,12 @@ const sendResponse = async (response, nodeResponse) => {
     nodeResponse.writeHead(response.status, Object.fromEntries(response.headers));
     nodeResponse.end(response.body ? await response.text() : undefined);
 };
+
+/**
+ * @typedef {import('./types/web-server.ts').WebServer} WebServer
+ * @typedef {import('./types/web-server.ts').WebRoute} WebRoute
+ * @typedef {import('./types/web-server.ts').WebSocketRoute} WebSocketRoute
+ * @typedef {import('./types/web-server.ts').WebRespond} WebRespond
+ * @typedef {import('http').ServerResponse} ServerResponse 
+ * @typedef {import('http').IncomingMessage} IncomingMessage 
+ **/
