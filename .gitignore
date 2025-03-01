@@ -6,4 +6,5 @@ node_modules/
 
 # app
 public/index.html
+public/cache-worker.js
 src/stack/secrets.js

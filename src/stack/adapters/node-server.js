@@ -95,7 +95,15 @@ const getFullUrl = (nodeRequest) => {
 }
 
 /** @param {IncomingMessage} nodeRequest */
-const formatRequest = (nodeRequest) => new Request(getFullUrl(nodeRequest), nodeRequest);
+const formatRequest = (nodeRequest) => {
+    const headers = Object.entries(nodeRequest.headers).reduce((props, [key, value]) => {
+        if (value !== undefined) {
+            props[key] = Array.isArray(value) ? value.join(', ') : value;
+        }
+        return props;
+    }, {});
+    return new Request(getFullUrl(nodeRequest), { headers });
+}
 
 /** @type {WebRespond} */
 const respond = (body, { status = 200, headers = { 'Content-Type': 'text/html' } } = {}) =>

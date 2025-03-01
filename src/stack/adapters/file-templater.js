@@ -1,14 +1,5 @@
 //@ts-check
 
-const patterns = {
-    liquid: /{{\s*([^{}\s]+)\s*}}/g,
-    slot: /<slot\s+name=['"]([^'"]+)['"]\s*>(.*?)<\/slot>/gs,
-    jsdocs: /\/\*\*[\s\S]+?\*\/\n?/gm,
-    comments: /\/\/.*\n?/gm,
-    exports: /^export\s+/gm,
-    imports: /^import.*\n?/gm,
-};
-
 /** @type {import('./types/templater.ts').Templater} */
 export const fileTemplater = {
     render: (template, variables = {}) =>
@@ -54,3 +45,12 @@ function stripJs(content) {
         .replace(patterns.exports, '')
         .replace(patterns.imports, '');
 }
+
+const patterns = {
+    liquid: /{{\s*([^{}\s]+)\s*}}/g,
+    slot: /<slot\s+name=['"]([^'"]+)['"]\s*>(.*?)<\/slot>/gs,
+    jsdocs: /^\s*\/\*\*[\s\S]+?\*\/\n?/gm,
+    comments: /\/\/.*\n?/gm,
+    exports: /^export\s+/gm,
+    imports: /^import.*\n?/gm,
+};

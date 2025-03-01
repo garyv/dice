@@ -18,6 +18,10 @@ const diceStart = await loadJs('diceStart');
 
 const hotReload = process.argv.some((arg) => arg === '--hot-reload');
 
+const cacheEvents = await loadJs('cacheEvents');
+const cacheClient = await loadJs('cacheClient');
+const cacheWorker = await loadJs('cacheWorker');
+
 const html = await load('layout', {
     head: `<title>${config.title}</title>
 <style>
@@ -34,10 +38,21 @@ ${randomizer}
 ${diceStart}
 </script>  
 
+<script>
+${cacheClient}
+</script>
+
 ${hotReload ? '<script src="/hot-reload.js"></script>' : ''}
 `,
 });
 
 fileStore.write(filePaths.build, html);
 
-console.log('Build complete.', html.split('\n').slice(-9).join('\n'), filePaths.build);
+console.log('Main complete.', html.split('\n').slice(-9).join('\n'), filePaths.build);
+
+fileStore.write(filePaths.cacheWorkerBuild, `
+${cacheEvents}
+${cacheWorker}
+`
+);
+console.log('Service worker complete.', filePaths.cacheWorkerBuild);
