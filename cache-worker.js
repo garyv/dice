@@ -1,12 +1,11 @@
 
-const cacheName = 'client-cache-0-01';
+const cacheName = 'client-cache-0-02';
 const cachePaths = ['/'];
 
 const cacheEvents = {
     open: async () => {
         return await caches.open(cacheName);
     },
-
     add: async () => {
         const cache = await cacheEvents.open();
         cachePaths.forEach ( async (path) => {
@@ -18,7 +17,6 @@ const cacheEvents = {
         const cachedResponse = await cache.match(request);
         return cachedResponse || fetch(request);
     },
-
     update: async () => {
         const cache = await cacheEvents.open();
         cachePaths.forEach( async (path) => {
@@ -26,12 +24,11 @@ const cacheEvents = {
             if (!cachedResponse) return;
             const etag = cachedResponse.headers.get('etag');
             const response = await fetch(path, { method: 'HEAD' });
-            console.log('cache update in progress', { path, etag, response, cache });
+            console.log('cache update check in progress', { path, etag, response, cache });
             if (!response.ok) return;
             if (response.headers.get('etag') === etag) return;
             await cache.delete(path);
             await cache.add(path);
-            console.log('cache updated', { path, etag });
         })
     }
 };

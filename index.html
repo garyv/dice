@@ -3,6 +3,11 @@
 
 <head>
     <title>Dice App</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
+<meta name='theme-color' content='#000'>
+<link rel='manifest' href='/manifest.json'>
+<link rel='icon' href='/dice.svg' type='image/svg+xml'>
+<link rel='apple-touch-icon' href='/dice.svg'>
 <style>
 html,
 body {
@@ -312,21 +317,12 @@ const randomizer = {
 };
 
 diceEvents.start({ ...diceConfig, ...randomizer });
-</script>  
 
-<script>
 window.addEventListener('load', () => {
     if (!('serviceWorker' in navigator)) return;
 
     navigator.serviceWorker.register('./cache-worker.js')
-        .then((registration) => {
-            console.log('Service Worker registered successfully with scope:', registration.scope);
-        })
-        .catch((error) => {
-            console.error('Service Worker registration failed:', error);
-        });
 });
-
 
 </script>
 
