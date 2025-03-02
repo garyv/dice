@@ -11,6 +11,11 @@
             "src": "./dice.svg",
             "sizes": "1024x1024",
             "type": "image/svg+xml"
+        },
+        {
+            "src": "./dice_180.png",
+            "sizes": "180x180",
+            "type": "image/png"
         }
     ],
     "offline_enabled": true
