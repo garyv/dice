@@ -1,10 +1,12 @@
-# Dice App
+# Dice
 
 ## Summary
-The Dice App is a web application that allows users to roll virtual dice. 
+Dice is a web application for rolling virtual dice. 
 
 ## Folder Structure
 ```
+$ tree -I 'node_modules' 
+.
 ├── public/
 │   └── index.html
 └── src/
@@ -31,13 +33,19 @@ The Dice App is a web application that allows users to roll virtual dice.
     │   │       ├── templater.ts
     │   │       └── web-server.ts
     │   ├── build.js
-    │   ├── resources/
-    │   │   ├── dev-server.js
-    │   │   ├── dice-client.js
-    │   │   ├── file-paths.js
-    │   │   └── hot-reload.js
+    │   └── resources/
+    │       ├── cache-client.js
+    │       ├── cache-events.js
+    │       ├── cache-worker.js
+    │       ├── dev-server.js
+    │       ├── dice-client.js
+    │       ├── file-paths.js
+    │       └── hot-reload.js
     └── views/
+        ├── images/
+        │   └── dice.svg
         ├── layout/
+        │   ├── meta.html
         │   ├── root.css
         │   └── root.html
         └── pages/
@@ -48,21 +56,21 @@ The Dice App is a web application that allows users to roll virtual dice.
 ### Directory Breakdown
 - **src/**: Contains all the source code for the application.
     - **domain/**: Contains domain-specific logic and models, with no external dependencies.
-        - **events/**: Handles event-related logic.
+        - **events/**: Handles event logic.
             - **types/**: TypeScript definitions for events.
         - **models/**: Contains data models and related logic.
             - **types/**: TypeScript definitions for models.
-    - **stack/**: Contains infrastructure and build-related code.
+    - **stack/**: Contains infrastructure and build related code.
         - **adapters/**: Manages external dependencies.
             - **types/**: TypeScript definitions for adapters. The adapters types themselves should have no external dependencies.
         - **resources/**: Contains resource files for the application.
     - **views/**: Contains the UI layout and pages. These depend on the stack to fill in variables.
-        - **layout/**: Contains layout-related files.
+        - **layout/**: Contains layout files.
         - **pages/**: Contains individual page files.
 - **public/**: Contains static files and the main HTML file.
 - **scripts/**: Contains scripts for various tasks.
 - **package.json**: Contains project metadata and dependencies.
-- **README.md**: You are here.
+- **readme.md**: You are here.
 
 ## Division of Responsibility and Dependency Model
 All external dependencies are managed through adapters in the `src/stack/adapters/` directory. These adapters use TypeScript to create generalized interfaces, ensuring that the core application logic remains isolated from external dependencies.
@@ -94,6 +102,5 @@ This script is run on every commit to main. It runs build.js and pushes the buil
 The application uses TypeScript for specifying types and better development experience. JavaScript is primarily used, with Typescript info loaded from files in seperate `/types` directorires to provide type safety and IDE completion for JavaScript files.
 
 ## Roadmap
-- Add offline support using web worker
 - Add additional dice
 

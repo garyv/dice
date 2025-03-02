@@ -1,0 +1,22 @@
+{
+    "name": "Dice",
+    "short_name": "Dice",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#000",
+    "theme_color": "#000",
+    "description": "A web application for rolling virtual dice.",
+    "icons": [
+        {
+            "src": "./dice.svg",
+            "sizes": "1024x1024",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "./dice_180.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "offline_enabled": true
+}

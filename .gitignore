@@ -6,5 +6,8 @@ node_modules/
 
 # app
 public/index.html
+public/manifest.json
 public/cache-worker.js
+public/dice.svg
+public/dice_180.png
 src/stack/secrets.js

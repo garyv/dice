@@ -5,8 +5,9 @@ import { nodeServer as web } from '../adapters/node-server.js';
 import { filePaths as paths } from './file-paths.js';
 
 const { load } = fileTemplater.init(store, paths);
-const hotReload = await load('hotReload');
 const cacheWorkerBuild = await load('cacheWorkerBuild');
+const hotReload = await load('hotReload');
+const manifestBuild = await load('manifestBuild');
 const server = web.createServer();
 const { get, respond } = server;
 
@@ -15,15 +16,28 @@ get('/', async () => {
     return respond(build);
 });
 
+get('/cache-worker.js', async () => 
+    respond(cacheWorkerBuild, {
+        headers: { 'Content-Type': 'application/javascript' },
+    })
+);
+
+get('/dice.svg', async () => {
+    const iconBuild = await load('iconBuild');
+    return respond(iconBuild, {
+        headers: { 'Content-Type': 'image/svg+xml' },
+    })  
+});
+
 get('/hot-reload.js', async () =>
     respond(hotReload, {
         headers: { 'Content-Type': 'application/javascript' },
     })
 );
 
-get('/cache-worker.js', async () => 
-    respond(cacheWorkerBuild, {
-        headers: { 'Content-Type': 'application/javascript' },
+get('/manifest.json', async () => 
+    respond(manifestBuild, {
+        headers: { 'Content-Type': 'application/json' }
     })
 );
 

@@ -2,10 +2,12 @@
 import { resolve } from 'path';
 
 const mainPaths = {
-    /** Output path file single page app */
+    /** Output path for single page app */
     build: '../public/index.html',
     /** Base html layout */
     layout: 'views/layout/root.html',
+    /** meta tags in head */
+    meta: 'views/layout/meta.html',
     /** Base css styles */
     rootStyles: 'views/layout/root.css',
 }
@@ -27,6 +29,13 @@ export const filePaths = {
     cacheEvents: 'stack/resources/cache-events.js',
     cacheWorker: 'stack/resources/cache-worker.js',
     cacheWorkerBuild: '../public/cache-worker.js',
+    /** Dice icon */
+    icon: 'views/images/dice.svg',
+    iconBuild: '../public/dice.svg',
+    icon180: 'views/images/dice_180.png',
+    icon180Build: '../public/dice_180.png',
+    manifest: 'stack/manifest.json',
+    manifestBuild: '../public/manifest.json',
 };
 
 Object.keys(filePaths).forEach(name => {

@@ -1,12 +1,14 @@
 //@ts-check
-const cacheName = 'client-cache-0-01';
-const cachePaths = ['/'];
+const cacheName = 'client-cache-0-03';
+const cachePaths = ['./'];
 
 export const cacheEvents = {
+    /** @returns {Promise<Cache>} */
     open: async () => {
         return await caches.open(cacheName);
     },
 
+    /** add every path to the cache -  */
     add: async () => {
         const cache = await cacheEvents.open();
         cachePaths.forEach ( async (path) => {
@@ -21,6 +23,7 @@ export const cacheEvents = {
         return cachedResponse || fetch(request);
     },
 
+    /** request each path & update its cache if etag does not match */
     update: async () => {
         const cache = await cacheEvents.open();
         cachePaths.forEach( async (path) => {
@@ -28,12 +31,11 @@ export const cacheEvents = {
             if (!cachedResponse) return;
             const etag = cachedResponse.headers.get('etag');
             const response = await fetch(path, { method: 'HEAD' });
-            console.log('cache update in progress', { path, etag, response, cache });
+            console.log('cache update check in progress', { path, etag, response, cache });
             if (!response.ok) return;
             if (response.headers.get('etag') === etag) return;
             await cache.delete(path);
             await cache.add(path);
-            console.log('cache updated', { path, etag });
         })
     }
 };
