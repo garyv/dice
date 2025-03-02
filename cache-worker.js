@@ -1,6 +1,6 @@
 
 const cacheName = 'client-cache-0-02';
-const cachePaths = ['/'];
+const cachePaths = ['./'];
 
 const cacheEvents = {
     open: async () => {
