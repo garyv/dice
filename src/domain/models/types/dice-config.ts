@@ -15,4 +15,9 @@ export type DiceConfig = {
     parentSelector: string;
     htmlProps: string;
     parentProps: string;
+    /** control dice quantity */
+    removeButtonProps: string;
+    addButtonProps: string;
+    removeButtonSelector: string;
+    addButtonSelector: string;
 };

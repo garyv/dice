@@ -2,28 +2,39 @@
     --background-color: hsl(200, 22%, 90%);
     --border-color: hsl(0, 0%, 5%);
     --border-radius: 1px;
-    --border-width: 2vmin;
+    --button-background-color: hsla(0, 0%, 0%, 0.5);
+    --button-color: var(--background-color);
+    --button-font-size: 10vh;
+    --button-size: 8vh;
+    --cube-gap: 5.5vmax;
     --dot-color: hsl(0, 0%, 5%);
     --dot-size: 20%;
     --duration: 2.8s;
-    --half-size: calc(var(--size) / 2);
+    --footer-gap: 2vh;
     --opacity: 1;
-    --transparent: 0.42;
     --size: 45vmin;
+    --transparent: 0.42;
 }
 
 .space-3d {
-    height: var(--size);
-    width: var(--size);
-    display: grid;
-    perspective-origin: 50% 100%;
-    perspective: 150vmin;
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
     place-content: center;
+    perspective: 150vmin;
+    perspective-origin: 50% 50%;
 }
 
 .cube {
+    --half-size: calc(var(--size) / 2);
+    --border-width: calc(var(--size) * 0.045);
     height: var(--size);
     width: var(--size);
+    flex-shrink: 0;
+    margin: var(--cube-gap);
     position: relative;
     transform-style: preserve-3d;
     transition: transform var(--duration);
@@ -159,5 +170,33 @@
     > :nth-child(6) {
         left: 80%;
         top: 80%;
+    }
+}
+
+.footer {
+    display: flex;
+    box-sizing: border-box;
+    gap: var(--footer-gap);
+    padding: var(--footer-gap);
+    position: fixed;
+    right: 0;
+    bottom: 0;
+
+    > button {
+        cursor: pointer;
+        background-color: var(--button-background-color);
+        border-radius: 50%;
+        border: none;
+        color: var(--button-color);
+        font-size: var(--button-size);
+        line-height: var(--button-size);
+        padding: 0;
+        opacity: 0.62;
+        transition: opacity 0.5s;
+
+        &:hover {
+            opacity: 1;
+            transition: opacity 0.1s;
+        }
     }
 }
