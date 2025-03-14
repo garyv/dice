@@ -3,6 +3,7 @@
 
 <head>
     <title>Dice App</title>
+<meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
 <meta name='theme-color' content='#000'>
 <link rel='manifest' href='./manifest.json'>
@@ -31,28 +32,39 @@ body {
     --background-color: hsl(200, 22%, 90%);
     --border-color: hsl(0, 0%, 5%);
     --border-radius: 1px;
-    --border-width: 2vmin;
+    --button-background-color: hsla(0, 0%, 0%, 0.5);
+    --button-color: var(--background-color);
+    --button-font-size: 10vh;
+    --button-size: 8vh;
+    --cube-gap: 5.5vmax;
     --dot-color: hsl(0, 0%, 5%);
     --dot-size: 20%;
     --duration: 2.8s;
-    --half-size: calc(var(--size) / 2);
+    --footer-gap: 2vh;
     --opacity: 1;
-    --transparent: 0.42;
     --size: 45vmin;
+    --transparent: 0.42;
 }
 
 .space-3d {
-    height: var(--size);
-    width: var(--size);
-    display: grid;
-    perspective-origin: 50% 100%;
-    perspective: 150vmin;
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
     place-content: center;
+    perspective: 150vmin;
+    perspective-origin: 50% 50%;
 }
 
 .cube {
+    --half-size: calc(var(--size) / 2);
+    --border-width: calc(var(--size) * 0.045);
     height: var(--size);
     width: var(--size);
+    flex-shrink: 0;
+    margin: var(--cube-gap);
     position: relative;
     transform-style: preserve-3d;
     transition: transform var(--duration);
@@ -190,6 +202,35 @@ body {
         top: 80%;
     }
 }
+
+.footer {
+    display: flex;
+    box-sizing: border-box;
+    gap: var(--footer-gap);
+    justify-content: right;
+    padding: var(--footer-gap);
+    position: fixed;
+    right: 100%;
+    bottom: 0;
+
+    > button {
+        cursor: pointer;
+        background-color: var(--button-background-color);
+        padding: 0;
+        border-radius: 50%;
+        border: none;
+        color: var(--button-color);
+        font-size: var(--button-size);
+        line-height: var(--button-size);
+        opacity: 0.62;
+        transition: opacity 0.5s;
+
+        &:hover {
+            opacity: 1;
+            transition: opacity 0.1s;
+        }
+    }
+}
 </style>
 </head>
 
@@ -220,6 +261,15 @@ body {
     </div>
 </section>
 
+<footer class='footer'>
+    <button id='remove' aria-label='Remove one die' type='button' hidden>
+        －
+    </button>
+    <button id='add' aria-label='Add a die' type='button'>
+        ＋
+    </button>
+</footer>
+
 <script>
 const diceConfig = {
     title: 'Dice App',
@@ -227,22 +277,32 @@ const diceConfig = {
     spinStep: 90,
     spinMax: 32,
     min: 1,
-    max: 2,
+    max: 6,
     cssSelector: "[role='button']",
     htmlProps: "role='button' aria-label='Click to roll the dice'",
     parentSelector: "[role='region']",
     parentProps: "role='region' aria-label='Dice container'",
+    addButtonSelector: '#add',
+    addButtonProps: "id='add' aria-label='Add a die'",
+    removeButtonSelector: '#remove',
+    removeButtonProps: "id='remove' aria-label='Remove one die'",
 };
 
 const diceEvents = {
-    getAll: ({cssSelector}) =>  (
-        document.querySelectorAll(cssSelector)
-    ),
+    getAll: ({ cssSelector }) => document.querySelectorAll(cssSelector),
 
-    dragStart: ({ clientX, clientY }) => {
+    dragStart: (dice, { clientX, clientY }) => {
         state.dragging = true;
         state.startX = clientX;
-        state.startY = clientY; 
+        state.startY = clientY;
+
+        const transform = dice.style.transform;
+
+        const rotateXMatch = transform.match(/rotateX\((\d+)deg\)/);
+        const rotateYMatch = transform.match(/rotateY\((\d+)deg\)/);
+
+        state.x = rotateXMatch ? parseInt(rotateXMatch[1], 10) : 0;
+        state.y = rotateYMatch ? parseInt(rotateYMatch[1], 10) : 0;
     },
 
     drag: (dice, { clientX, clientY }) => {
@@ -253,59 +313,143 @@ const diceEvents = {
 
         dice.style.transform = getRotation({
             x: state.x - (clientY - state.startY),
-            y: state.y + (clientX - state.startX)
+            y: state.y + (clientX - state.startX),
         });
     },
 
-    roll: (dice, {spinDuration, ...transformOptions}) => {
+    roll: (dice, { spinDuration, ...transformOptions }) => {
         dice.style.setProperty('--duration', spinDuration);
         dice.style.setProperty('--opacity', '1');
         dice.style.transform = setRotation(transformOptions);
     },
 
-    rollAll: ({cssSelector, ...rollOptions}) => {
+    rollAll: ({ cssSelector, ...rollOptions }) => {
         if (!state.dragging) return;
         state.dragging = false;
-        diceEvents.getAll({cssSelector}).forEach(dice => 
-            diceEvents.roll(dice, rollOptions)
-        );
+        diceEvents.getAll({ cssSelector }).forEach((dice) => diceEvents.roll(dice, rollOptions));
     },
 
-    start: ({cssSelector, parentSelector, ...rollOptions}) => {
+    start: ({
+        cssSelector,
+        parentSelector,
+        addButtonSelector,
+        min,
+        max,
+        removeButtonSelector,
+        ...rollOptions
+    }) => {
+        startDiceRollingEvents({ cssSelector, parentSelector, rollOptions });
 
-        diceEvents.getAll({cssSelector}).forEach(dice => {
-            dice.addEventListener('pointerdown', diceEvents.dragStart);
-            
-            dice.addEventListener('pointermove', (event) => {
-                requestAnimationFrame(() => {
-                    diceEvents.drag(dice, event);
-                });
-            });
-        });
-
-        diceEvents.getAll({cssSelector: parentSelector}).forEach(parent => {
-            parent.addEventListener('pointerup', () => {
-                diceEvents.rollAll({cssSelector, ...rollOptions})
-            });
-
-            parent.addEventListener('pointerleave', () => {
-                diceEvents.rollAll({cssSelector, ...rollOptions})
-            });
+        startButtonEvents({
+            cssSelector,
+            parentSelector,
+            addButtonSelector,
+            min,
+            max,
+            removeButtonSelector,
+            rollOptions,
         });
     },
-}
+};
 
-const getRotation = ({ x, y }) =>  `rotateX(${ x }deg) rotateY(${ y }deg)`;
+const getRotation = ({ x, y }) => `rotateX(${x}deg) rotateY(${y}deg)`;
 
 const state = {
     dragging: false,
+    count: 1,
     startX: 0,
-    startY: 0,  
+    startY: 0,
     x: 0,
     y: 0,
 };
-const setRotation = ({spinMax, spinStep, getRandomNumber}) => {
-    const numberOptions = { start: 0, length: spinMax, step: spinStep }; 
+
+const startDiceRollingEvents = ({ cssSelector, parentSelector, rollOptions }) => {
+        diceEvents.getAll({ cssSelector }).forEach((dice) => {
+        dice.addEventListener('pointerdown', (event) => {
+            diceEvents.dragStart(dice, event);
+        });
+
+        dice.addEventListener('pointermove', (event) => {
+            requestAnimationFrame(() => {
+                diceEvents.drag(dice, event);
+            });
+        });
+    });
+
+    diceEvents.getAll({ cssSelector: parentSelector }).forEach((parent) => {
+        parent.addEventListener('pointerup', () => {
+            diceEvents.rollAll({ cssSelector, ...rollOptions });
+        });
+
+        parent.addEventListener('pointerleave', () => {
+            diceEvents.rollAll({ cssSelector, ...rollOptions });
+        });
+    });
+};
+
+const startButtonEvents = ({
+    cssSelector,
+    parentSelector,
+    addButtonSelector,
+    min,
+    max,
+    removeButtonSelector,
+    rollOptions,
+}) => {
+    if (state.diceElement) return;
+
+        const diceElement = document.querySelector(cssSelector);
+    const addButton = document.querySelector(addButtonSelector);
+    const removeButton = document.querySelector(removeButtonSelector);
+    if (!(addButton instanceof HTMLElement) || !(removeButton instanceof HTMLElement)) return;
+
+    state.diceElement = diceElement.cloneNode(true);
+
+    const updateCountOptions = {
+        max,
+        min,
+        addButton,
+        removeButton,
+        parentSelector,
+        cssSelector,
+        rollOptions,
+    };
+
+    addButton.addEventListener('click', () => {
+        updateCount(state.count + 1, updateCountOptions);
+    });
+
+    removeButton.addEventListener('click', () => {
+        updateCount(state.count - 1, updateCountOptions);
+    });
+};
+
+const updateCount = (
+    newCount,
+    { max, min, addButton, removeButton, parentSelector, cssSelector, rollOptions }
+) => {
+    const { diceElement, count } = state;
+    if (newCount === count) return;
+    if (newCount < min || newCount > max) return;
+    if (!(diceElement instanceof HTMLElement)) return;
+
+    const parent = document.querySelector(parentSelector);
+    if (!(parent instanceof HTMLElement)) return;
+
+    addButton.hidden = newCount === max;
+    removeButton.hidden = newCount === min;
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < newCount; i++) {
+        fragment.appendChild(diceElement.cloneNode(true));
+    }
+    parent.innerHTML = '';
+    parent.style.setProperty('--size', `${49 - newCount * 6}vmin`);
+    parent.appendChild(fragment);
+    state.count = newCount;
+    startDiceRollingEvents({ cssSelector, parentSelector, rollOptions });
+};
+const setRotation = ({ spinMax, spinStep, getRandomNumber }) => {
+    const numberOptions = { start: 0, length: spinMax, step: spinStep };
     state.x = getRandomNumber(numberOptions);
     state.y = getRandomNumber(numberOptions);
     return getRotation(state);

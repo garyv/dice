@@ -1,5 +1,5 @@
 
-const cacheName = 'client-cache-0-03';
+const cacheName = 'client-cache-0-04';
 const cachePaths = ['./'];
 
 const cacheEvents = {
