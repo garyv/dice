@@ -1,5 +1,5 @@
 
-const cacheName = 'client-cache-0-04';
+const cacheName = 'client-cache-0-05';
 const cachePaths = ['./'];
 
 const cacheEvents = {
@@ -24,6 +24,7 @@ const cacheEvents = {
             if (!cachedResponse) return;
             const etag = cachedResponse.headers.get('etag');
             const response = await fetch(path, { method: 'HEAD' });
+            
             console.log('cache update check in progress', { path, etag, response, cache });
             if (!response.ok) return;
             if (response.headers.get('etag') === etag) return;
