@@ -6,7 +6,7 @@
     --button-color: var(--background-color);
     --button-font-size: 10vh;
     --button-size: 8vh;
-    --cube-gap: 5.5vmax;
+    --cube-gap: 5vmax;
     --dot-color: hsl(0, 0%, 5%);
     --dot-size: 20%;
     --duration: 2.8s;
@@ -22,10 +22,11 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: center;
     place-content: center;
     perspective: 150vmin;
     perspective-origin: 50% 50%;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .cube {
@@ -174,6 +175,8 @@
 }
 
 .footer {
+    user-select: none;
+    -webkit-user-select: none;
     display: flex;
     box-sizing: border-box;
     gap: var(--footer-gap);

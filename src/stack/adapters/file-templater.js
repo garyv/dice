@@ -50,7 +50,7 @@ const patterns = {
     liquid: /{{\s*([^{}\s]+)\s*}}/g,
     slot: /<slot\s+name=['"]([^'"]+)['"]\s*>(.*?)<\/slot>/gs,
     jsdocs: /^\s*\/\*\*[\s\S]+?\*\/\n?/gm,
-    comments: /\/\/.*\n?/gm,
+    comments: /^\s*\/\/.*\n?/gm,
     exports: /^export\s+/gm,
     imports: /^import.*\n?/gm,
 };

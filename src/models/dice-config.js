@@ -1,9 +1,5 @@
 //@ts-check
-/** 
- * Properties for 3d cube and animation 
- * 
- * @type {import('./types/dice-config').DiceConfig} 
- */
+/** Properties for dice rollig application @type {import('./types/dice-config').DiceConfig} */
 export const diceConfig = {
     title: 'Dice App',
     spinDuration: '0.62s',
@@ -16,7 +12,7 @@ export const diceConfig = {
     parentSelector: "[role='region']",
     parentProps: "role='region' aria-label='Dice container'",
     addButtonSelector: '#add',
-    addButtonProps: "id='add' aria-label='Add a die'",
+    addButtonProps: "id='add' aria-label='Add one die'",
     removeButtonSelector: '#remove',
     removeButtonProps: "id='remove' aria-label='Remove one die'",
 };

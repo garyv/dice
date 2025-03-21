@@ -15,10 +15,12 @@ const mainPaths = {
 export const filePaths = {
     ...mainPaths,
     /** Dice configuration */
-    diceConfig: 'domain/models/dice-config.js',
-    diceEvents: 'domain/events/dice-events.js',
-    diceStart: 'stack/resources/dice-client.js',
-    randomizer: 'domain/models/randomizer.js',
+    diceConfig: 'models/dice-config.js',
+    /** Dice business logic */
+    diceEvents: 'events/dice-events.js',
+    diceRotation: 'models/dice-rotation.js',
+    diceRules: 'models/dice-rules.js',
+    randomizer: 'models/randomizer.js',
     /** Dice html */
     dicePage: 'views/pages/dice.html',
     diceStyles: 'views/pages/dice.css',

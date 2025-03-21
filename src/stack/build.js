@@ -2,7 +2,7 @@
 import { fileTemplater } from './adapters/file-templater.js';
 import { fileStore as store } from './adapters/file-store.js';
 import { filePaths as paths } from './resources/file-paths.js';
-import { diceConfig as config } from '../domain/models/dice-config.js';
+import { diceConfig as config } from '../models/dice-config.js';
 
 const { load, loadJs } = fileTemplater.init(store, paths);
 
@@ -14,9 +14,10 @@ const rootStyles = await load('rootStyles');
 const diceConfig = await loadJs('diceConfig');
 const diceEvents = await loadJs('diceEvents');
 const dicePage = await load('dicePage', config);
-const diceStart = await loadJs('diceStart');
 const diceStyles = await load('diceStyles');
 const randomizer = await loadJs('randomizer');
+const diceRules = await loadJs('diceRules');
+const diceRotation = await loadJs('diceRotation');
 
 const cacheClient = await loadJs('cacheClient');
 const cacheEvents = await loadJs('cacheEvents');
@@ -38,8 +39,9 @@ ${diceStyles}
 <script>
 ${diceConfig}
 ${diceEvents}
+${diceRules}
+${diceRotation}
 ${randomizer}
-${diceStart}
 
 ${!hotReload ? cacheClient : ''}
 </script>
