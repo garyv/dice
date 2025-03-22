@@ -390,9 +390,6 @@ const startDiceRollingEvents = () => {
 
         dice.addEventListener('pointermove', (event) => {
             onPointerMove(event);
-            requestAnimationFrame(() => {
-                emit('dragMove', dice, event);
-            });
         });
     });
 
