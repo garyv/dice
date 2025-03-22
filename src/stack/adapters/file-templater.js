@@ -52,5 +52,5 @@ const patterns = {
     jsdocs: /^\s*\/\*\*[\s\S]+?\*\/\n?/gm,
     comments: /^\s*\/\/.*\n?/gm,
     exports: /^export\s+/gm,
-    imports: /^import.*\n?/gm,
+    imports: /^import[\s\S]+?;\s*$/gm,
 };

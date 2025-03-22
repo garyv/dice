@@ -18,6 +18,7 @@ const dicePage = await load('dicePage', config);
 const diceStyles = await load('diceStyles');
 const randomizer = await loadJs('randomizer');
 const useEvents = await loadJs('useEvents');
+const useDebounced = await loadJs('useDebounced');
 const diceRules = await loadJs('diceRules');
 const diceRotation = await loadJs('diceRotation');
 
@@ -39,12 +40,13 @@ ${diceStyles}
 
 <script>
 ${diceConfig}
-${useState}
+${useDebounced}
 ${useEvents}
-${diceEvents}
+${useState}
 ${diceRules}
 ${diceRotation}
 ${randomizer}
+${diceEvents}
 
 ${!hotReload ? cacheClient : ''}
 </script>

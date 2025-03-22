@@ -50,12 +50,12 @@ $ tree -I 'node_modules'
     ├── events
     │   ├── dice-events.js
     │   └── types
-    │       ├── dice-event-map.ts
-    │       └── event-emitter.ts
+    │       └── dice-event-map.ts
     ├── hooks
     │   ├── types
     │   │   ├── use-events.ts
     │   │   └── use-state.ts
+    │   ├── use-debounced.js
     │   ├── use-events.js
     │   └── use-state.js
     ├── models

@@ -5,12 +5,12 @@ export const diceRotation = {
     formatRotation: ({ rotateX, rotateY }) =>
         `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
 
-    getDragRotation({clientX, clientY}, { rotateX, rotateY, startRotateX, startRotateY}) {
-        const deltaX = clientX - startRotateX;
-        const deltaY = clientY - startRotateY;
+    getDragRotation({clientX, clientY}, { rotateX, rotateY, originX, originY, isFlipped}) {
+        const deltaX = clientX - originX;
+        const deltaY = clientY - originY;
         return {
             rotateX: rotateX - deltaY,
-            rotateY: rotateY + deltaX,
+            rotateY: rotateY + deltaX * isFlipped,
         };
     },
 

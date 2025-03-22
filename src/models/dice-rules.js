@@ -6,7 +6,7 @@ export const diceRules = {
             case 1:
                 return '45vmin';
             case 2:
-                return '38vmin';
+                return '30vmin';
             case 3:
             case 4:
                 return '26vmin';
