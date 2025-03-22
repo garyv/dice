@@ -21,6 +21,7 @@ export const filePaths = {
     diceRotation: 'models/dice-rotation.js',
     diceRules: 'models/dice-rules.js',
     randomizer: 'models/randomizer.js',
+    useDebounced: 'hooks/use-debounced.js',
     useEvents: 'hooks/use-events.js',
     useState: 'hooks/use-state.js',
     /** Dice html */
