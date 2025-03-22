@@ -3,55 +3,39 @@ import { diceConfig } from '../models/dice-config.js';
 import { readRotation, formatRotation, getDragRotation, getRandomRotation } from '../models/dice-rotation.js';
 import { getSize, isValidCount } from '../models/dice-rules.js';
 import { randomizer } from '../models/randomizer.js';
+import { useState } from '../hooks/use-state.js';
+import { useEvents } from '../hooks/use-events.js';
 
 /** @typedef {import('./types/dice-event-map.ts').DiceEventMap} DiceEventMap */
-/** @type {import('./types/event-emitter.ts').EventEmitter<DiceEventMap>} */
-export const diceEvents = {
-    listeners: {},
+/** @type {import('../hooks/types/use-events.ts').EventEmitter<DiceEventMap>} */
+const {on, emit} = useEvents();
 
-    on(event, listener) {
-        if (!this.listeners[event]) {
-            this.listeners[event] = [];
-        }
-        this.listeners[event].push(listener);
-    },
-
-    off(event, listener) {
-        if (!this.listeners[event]) return;
-        this.listeners[event] = this.listeners[event].filter((f) => f !== listener);
-    },
-
-    async emit(event, ...args) {
-        if (!this.listeners[event]) return;
-        await Promise.all(this.listeners[event].map((listener) => listener(...args)));
-    },
-};
-
-let state = {
+const diceState = useState({
     count: 1,
     dragging: false,
     rotateX: 0,
     rotateY: 0,
     startRotateX: 0,
     startRotateY: 0,
-};
+    diceElement: document.querySelector(diceConfig.cssSelector),
+});
 
-diceEvents.on('ready', () => {
+on('ready', () => {
     startDiceRollingEvents();
     startUpdateCountEvents();
 });
 
-diceEvents.on('dragStart', (dice, { clientX, clientY }) => {
-    state = {
-        ...state,
+on('dragStart', (dice, { clientX, clientY }) => {
+    diceState.set({
         ...readRotation(dice.style.transform),
         dragging: true,
         startRotateX: clientX,
         startRotateY: clientY,
-    };
+    });
 });
 
-diceEvents.on('dragMove', (dice, event) => {
+on('dragMove', (dice, event) => {
+    const state = diceState.get();
     if (!state.dragging) return;
 
     dice.style.setProperty('--duration', '0');
@@ -62,43 +46,44 @@ diceEvents.on('dragMove', (dice, event) => {
     );
 });
 
-diceEvents.on('roll', (dice) => {
+on('roll', (dice) => {
     dice.style.setProperty('--duration', diceConfig.spinDuration);
     dice.style.setProperty('--opacity', '1');
-    state = {
-        ...state,
+    diceState.set({
         ...getRandomRotation(randomizer)
-    };
-    dice.style.transform = formatRotation(state);
+    });
+    dice.style.transform = formatRotation(diceState.get());
 });
 
-diceEvents.on('rollAll', () => {
-    if (!state.dragging) return;
-    state.dragging = false;
-    getAll().forEach((dice) => diceEvents.emit('roll', dice));
+on('rollAll', () => {
+    if (!diceState.get().dragging) return;
+    diceState.set({dragging : false});
+    getAll().forEach((dice) => emit('roll', dice));
 });
 
 const startDiceRollingEvents = () => {
     // set up rolling and dragging dice
     getAll().forEach((dice) => {
         dice.addEventListener('pointerdown', (event) => {
-            diceEvents.emit('dragStart', dice, event);
+            emit('dragStart', dice, event);
         });
 
+        const onPointerMove = debounce( (event) => {
+            emit('dragMove', dice, event);
+        })
+
         dice.addEventListener('pointermove', (event) => {
-            requestAnimationFrame(() => {
-                diceEvents.emit('dragMove', dice, event);
-            });
+            onPointerMove(event);
         });
     });
 
     getAll({ cssSelector: diceConfig.parentSelector }).forEach((parent) => {
         parent.addEventListener('pointerup', () => {
-            diceEvents.emit('rollAll');
+            emit('rollAll');
         });
 
         parent.addEventListener('pointerleave', () => {
-            diceEvents.emit('rollAll');
+            emit('rollAll');
         });
     });
 };
@@ -106,29 +91,31 @@ const startDiceRollingEvents = () => {
 const startUpdateCountEvents = () => {
     const { cssSelector, addButtonSelector, removeButtonSelector, parentSelector } = diceConfig;
 
-    if (state.diceElement) return;
-
-    // selecting ui for adding and removeing dice
-    const elements = [cssSelector, addButtonSelector, removeButtonSelector, parentSelector].map(selector => document.querySelector(selector));
-    if (!elements.every((element) => element instanceof HTMLElement)) return;
+    // selecting ui for adding and removing dice
+    const elements = [cssSelector, addButtonSelector, removeButtonSelector, parentSelector].map(cssSelector => getAll({cssSelector})[0]);
     const [diceElement, addButton, removeButton, parent] = elements;
-
     // copy dice element to state to use later as a template for more dice
-    state.diceElement = diceElement.cloneNode(true);
+    const clonedElement = diceElement.cloneNode(true);
+    if (!(clonedElement instanceof HTMLElement)) throw NoDiceError();
+
+    diceState.set({
+        diceElement: clonedElement
+    })
 
     addButton.addEventListener('click', () => {
-        updateCount(state.count + 1, { addButton, removeButton, parent });
+        updateCount(diceState.get().count + 1, { addButton, removeButton, parent });
     });
 
     removeButton.addEventListener('click', () => {
-        updateCount(state.count - 1, { addButton, removeButton, parent });
+        updateCount(diceState.get().count - 1, { addButton, removeButton, parent });
     });
 };
 
 const updateCount = (newCount, { addButton, removeButton, parent }) => {
-    const { diceElement, count } = state;
+    const { diceElement, count } = diceState.get();
     const { min, max } = diceConfig;
     if (!isValidCount(count, min, max)) return;
+    if (!diceElement) throw NoDiceError();
 
     addButton.hidden = newCount >= max;
     removeButton.hidden = newCount <= min;
@@ -139,15 +126,36 @@ const updateCount = (newCount, { addButton, removeButton, parent }) => {
     parent.innerHTML = '';
     parent.style.setProperty('--size', getSize(newCount));
     parent.appendChild(fragment);
-    state.count = newCount;
+    diceState.set({ count: newCount });
     startDiceRollingEvents();
 };
 
-/** @return {NodeListOf<HTMLElement>}  */
-const getAll = ({ cssSelector } = { cssSelector: diceConfig.cssSelector }) =>
-    document.querySelectorAll(cssSelector);
+const NoDiceError = (name='Dice') => new TypeError(`${name} missing on page`);
+
+const getAll = ({ cssSelector } = { cssSelector: diceConfig.cssSelector }) => {
+    const all = [...document.querySelectorAll(cssSelector)];
+    if (!all.every((element) => element instanceof HTMLElement)) {
+        throw NoDiceError(cssSelector);
+    }
+    return all;
+}    
+
+const debounce = (callback) => {
+    let pending = false;
+    let lastArgs;
+    
+    return (...args) => {
+        lastArgs = args;
+        if (pending) return;
+
+        return requestAnimationFrame(() => {
+            callback(...lastArgs);
+            pending = false;
+        })
+    }
+}
 
 // init page
 document.addEventListener('DOMContentLoaded', () => {
-    diceEvents.emit('ready');
+    emit('ready');
 });

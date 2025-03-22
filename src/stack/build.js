@@ -12,17 +12,18 @@ const meta = await load('meta');
 const rootStyles = await load('rootStyles');
 
 const diceConfig = await loadJs('diceConfig');
+const useState = await loadJs('useState');
 const diceEvents = await loadJs('diceEvents');
 const dicePage = await load('dicePage', config);
 const diceStyles = await load('diceStyles');
 const randomizer = await loadJs('randomizer');
+const useEvents = await loadJs('useEvents');
 const diceRules = await loadJs('diceRules');
 const diceRotation = await loadJs('diceRotation');
 
 const cacheClient = await loadJs('cacheClient');
 const cacheEvents = await loadJs('cacheEvents');
 const cacheWorker = await loadJs('cacheWorker');
-const manifest = await load('manifest');
 
 const hotReload = process.argv.some((arg) => arg === '--hot-reload');
 
@@ -38,6 +39,8 @@ ${diceStyles}
 
 <script>
 ${diceConfig}
+${useState}
+${useEvents}
 ${diceEvents}
 ${diceRules}
 ${diceRotation}

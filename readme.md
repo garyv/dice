@@ -3,10 +3,10 @@
 ## Summary
 
 Dice is a web application for rolling virtual dice. The concept for making this
-app was mostly an excuse for me to test ideas for JavaScript and Web
-architecture. I have carefully considerred the source code structure, dependency
-management, client side caching, developer server, and how to manage third party
-software with adapters and generic types.
+app was mostly an excuse for me to test ideas for JavaScript Web architecture
+and coding patterns. I have carefully considerred the source code structure,
+dependency management, client side caching, developer server, and how to manage
+third party software with adapters and generic types.
 
 ## Quick Start
 
@@ -39,12 +39,10 @@ build to the `gh-pages` branch.
 ```
 $ tree -I 'node_modules' 
 .
-.
 ├── package.json
 ├── public
 │   ├── cache-worker.js
 │   ├── dice.svg
-│   ├── dice_180.png
 │   ├── index.html
 │   └── manifest.json
 ├── readme.md
@@ -54,6 +52,12 @@ $ tree -I 'node_modules'
     │   └── types
     │       ├── dice-event-map.ts
     │       └── event-emitter.ts
+    ├── hooks
+    │   ├── types
+    │   │   ├── use-events.ts
+    │   │   └── use-state.ts
+    │   ├── use-events.js
+    │   └── use-state.js
     ├── models
     │   ├── dice-config.js
     │   ├── dice-rotation.js
@@ -104,6 +108,7 @@ $ tree -I 'node_modules'
 - **src/**: Contains all the source code for the application.
   - **events/**: Event handling logic.
     - **types/**: TypeScript definitions.
+  - **hooks/**: Utilities to be used by events
   - **models/**: Contains domain-specific logic and related logic with no
     external dependencies.
     - **types/**: TypeScript definitions for models.
@@ -122,7 +127,7 @@ $ tree -I 'node_modules'
 The models are the most stable part of the application, and has no dependencies
 on other parts of the application or external services.
 
-Events may only have depedencies on models
+Events may only have depedencies on models.
 
 The view is devoid of logic and and dependencies except for simple template
 variables.
