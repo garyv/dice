@@ -347,7 +347,7 @@ const diceRules = {
             case 1:
                 return '45vmin';
             case 2:
-                return '38vmin';
+                return '30vmin';
             case 3:
             case 4:
                 return '26vmin';
@@ -359,16 +359,17 @@ const diceRules = {
 };
 
 const { getSize, isValidCount } = diceRules;
+
 const diceRotation = {
     formatRotation: ({ rotateX, rotateY }) =>
         `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
 
-    getDragRotation({clientX, clientY}, { rotateX, rotateY, originX, originY}) {
+    getDragRotation({clientX, clientY}, { rotateX, rotateY, originX, originY, isFlipped}) {
         const deltaX = clientX - originX;
         const deltaY = clientY - originY;
         return {
             rotateX: rotateX - deltaY,
-            rotateY: rotateY + deltaX,
+            rotateY: rotateY + deltaX * isFlipped,
         };
     },
 
@@ -398,14 +399,21 @@ const randomizer = {
 };
 
 const { getRandomNumber } = randomizer;
+
+
+
+
+
+
+
 const { on, emit } = useEvents();
 
 document.addEventListener('DOMContentLoaded', () => emit('ready'));
 
 on('ready', () => {
     startDiceRollingEvents();
-    
-    const {addButton, removeButton, parent} = getDiceElements();
+
+    const { addButton, removeButton, parent } = getDiceElements();
 
     addButton.addEventListener('click', () => {
         updateCount(diceState.get().count + 1, { addButton, removeButton, parent });
@@ -424,11 +432,12 @@ const diceState = useState({
     rotateX: 0,
     rotateY: 0,
     diceElement: document.querySelector(diceConfig.cssSelector),
+    isFlipped: 1,
 });
 const getAll = ({ cssSelector = diceConfig.cssSelector } = {}) => {
     const elements = [...document.querySelectorAll(cssSelector)];
-    if (!elements.every(el => el instanceof HTMLElement)) {
-        throw new TypeError(`${cssSelector} missing on page`);
+    if (!elements.length || !elements.every((el) => el instanceof HTMLElement)) {
+        throw new TypeError(`No HTML Elements found for ${cssSelector}`);
     }
     return elements;
 };
@@ -443,29 +452,32 @@ on('roll', (dice) => {
 on('rollAll', () => {
     if (!diceState.get().dragging) return;
     diceState.set({ dragging: false });
-    getAll().forEach(dice => emit('roll', dice));
+    getAll().forEach((dice) => emit('roll', dice));
 });
 
 const startDiceRollingEvents = () => {
-    getAll().forEach(dice => {
-        dice.addEventListener('pointerdown', event => emit('dragStart', dice, event));
-        const onPointerMove = useDebounced(event => emit('dragMove', dice, event));
+    getAll().forEach((dice) => {
+        dice.addEventListener('pointerdown', (event) => emit('dragStart', dice, event));
+        const onPointerMove = useDebounced((event) => emit('dragMove', dice, event));
         dice.addEventListener('pointermove', onPointerMove);
     });
 
-    getAll({ cssSelector: diceConfig.parentSelector }).forEach(parent => {
-        ['pointerup', 'pointerleave'].forEach(event =>
+    getAll({ cssSelector: diceConfig.parentSelector }).forEach((parent) => {
+        ['pointerup', 'pointerleave'].forEach((event) =>
             parent.addEventListener(event, () => emit('rollAll'))
         );
     });
 };
 
-on('dragStart', (dice, { clientX: originX, clientY: originY }) => {
+on('dragStart', (dice, { clientX: originX, clientY: originY, target }) => {
+    const { rotateX, rotateY } = readRotation(dice.style.transform);
     diceState.set({
-        ...readRotation(dice.style.transform),
+        rotateX,
+        rotateY,
         dragging: true,
         originX,
         originY,
+        isFlipped: rotateX % 360 >= 180 ? -1 : 1,
     });
 });
 
@@ -479,23 +491,25 @@ on('dragMove', (dice, event) => {
 
 const getDiceElements = () => {
     const { cssSelector, addButtonSelector, removeButtonSelector, parentSelector } = diceConfig;
-    const elements = [cssSelector, addButtonSelector, removeButtonSelector, parentSelector].map(cssSelector => getAll({cssSelector})[0]);
+    const elements = [cssSelector, addButtonSelector, removeButtonSelector, parentSelector].map(
+        (cssSelector) => getAll({ cssSelector })[0]
+    );
     const [diceElement, addButton, removeButton, parent] = elements;
 
     const diceTemplate = diceElement.cloneNode(true);
     if (!(diceTemplate instanceof HTMLElement)) throw new TypeError('No Dice');
     diceState.set({ diceElement: diceTemplate });
-    return {addButton, removeButton, parent};
-}
+    return { addButton, removeButton, parent };
+};
 
 const updateCount = (newCount, { addButton, removeButton, parent }) => {
     const { diceElement } = diceState.get();
     const { min, max } = diceConfig;
     if (!isValidCount(newCount, min, max) || !diceElement) return;
-    
+
     addButton.hidden = newCount >= max;
     removeButton.hidden = newCount <= min;
-    
+
     const fragment = document.createDocumentFragment();
     Array.from({ length: newCount }, () => {
         fragment.appendChild(diceElement.cloneNode(true));
